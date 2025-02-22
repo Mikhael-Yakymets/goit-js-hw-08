@@ -66,11 +66,54 @@ const images = [
 
 const photoList = document.querySelector('.gallery');
 
-const markup = images
-  .map(
-    ({ preview, description }) =>
-      `<li class="gallery-item"><img src="${preview}" alt="${description}"></li>`
-  )
-  .join('');
+//#region Function create marckup
+function createGalleryMarkup(images) {
+  return images
+    .map(
+      ({ preview, original, description }) =>
+        `<li class="gallery-item">
+          <a class="gallery-link" href="${original}">
+            <img
+              class="gallery-image"
+              src="${preview}"
+              data-source="${original}"
+              alt="${description}"
+            />
+          </a>
+        </li>`
+    )
+    .join('');
+}
 
-photoList.insertAdjacentHTML('beforeend', markup);
+//#endregion Function create marckup
+
+//#region Function click
+
+function handlerImageClick(event) {
+  event.preventDefault();
+
+  if (event.target.nodeName !== 'IMG') return;
+
+  const largeImageURL = event.target.dataset.source;
+  console.log(`Відкрити велике зображення: ${largeImageURL}`);
+
+  const imgDescription = event.target.alt;
+  console.log(`Назва фото: ${imgDescription}`);
+
+  const currentImage = event.target.closest('.gallery-item');
+  console.log(currentImage);
+
+  const instance = basicLightbox.create(
+    `<div class="modal">
+      <img src="${largeImageURL}" alt="${imgDescription}" />
+    </div>`
+  );
+
+  instance.show();
+}
+
+//#endregion Function click
+
+photoList.insertAdjacentHTML('beforeend', createGalleryMarkup(images));
+
+photoList.addEventListener('click', handlerImageClick);
